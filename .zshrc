@@ -1,6 +1,5 @@
-
 [[ -o interactive ]] || return
-
+local starttime=$(date +%s.%N)
 export GREETING=""
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
@@ -125,3 +124,10 @@ setopt EXTENDED_GLOB
 setopt GLOB_COMPLETE
 setopt INTERACTIVE_COMMENTS
 setopt TRANSIENT_RPROMPT
+
+
+
+# Calculate and display shell startup time
+local endtime=$(date +%s.%N)
+local elapsed=$(echo "a=($endtime - $starttime) * 1000; scale=3; a/1" | bc)
+print "initialized in ${elapsed}ms"
