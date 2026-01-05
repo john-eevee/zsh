@@ -16,14 +16,16 @@ if [[ -d "$ANDROID_HOME" ]]; then
     )
 fi
 
-if command -v mise &>/dev/null; then
-    eval "$(mise activate zsh)"
-    export JAVA_HOME="$(mise where java 2>/dev/null)" || {
-        local system_java
-        system_java="$(readlink -f "$(command -v java)" 2>/dev/null)"
-        [[ -n "$system_java" ]] && export JAVA_HOME="${system_java%/bin/java}"
-    }
-fi
+path=("$HOME/.local/bin" $path)
+typeset -U path
+
+eval "$(mise activate zsh)"
+
+export JAVA_HOME="$(mise where java 2>/dev/null)" || {
+    local system_java
+    system_java="$(readlink -f "$(command -v java)" 2>/dev/null)"
+    [[ -n "$system_java" ]] && export JAVA_HOME="${system_java%/bin/java}"
+}
 export PROJECT_DIRS=(
     "$HOME/Projects"
     "$HOME/Work"
@@ -33,8 +35,6 @@ export PROJECT_DIRS=(
     "$HOME/code"
 )
 export EDITOR="${EDITOR:-zed}"
-path=("$HOME/.local/bin" $path)
-typeset -U path
 export HISTFILE="$XDG_CACHE_HOME/zsh_history"
 mkdir -p "$(dirname "$HISTFILE")"
 export HISTSIZE=50000
@@ -125,7 +125,9 @@ setopt GLOB_COMPLETE
 setopt INTERACTIVE_COMMENTS
 setopt TRANSIENT_RPROMPT
 
-
+# Other PATHs
+append-path "$HOME/.pub-cache/bin"
+append-path "$HOME/.local/share/mise/shims"
 
 # Calculate and display shell startup time
 local endtime=$(date +%s.%N)
