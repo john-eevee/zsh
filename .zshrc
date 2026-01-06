@@ -78,40 +78,6 @@ done
 
 if command -v starship &>/dev/null; then
         eval "$(starship init zsh)"
-else
-        setopt PROMPT_SUBST
-
-        git_prompt_info() {
-        local git_dir
-        git_dir="$(git rev-parse --git-dir 2>/dev/null)" || return
-
-        local branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
-        local status=""
-
-                if ! git diff-index --quiet HEAD 2>/dev/null; then
-            status="%F{red}●%f"          fi
-
-                if [[ -n "$(git ls-files --others --exclude-standard 2>/dev/null)" ]]; then
-            status="${status}%F{yellow}●%f"          fi
-
-                local ahead_behind
-        ahead_behind="$(git rev-list --left-right --count @{u}...HEAD 2>/dev/null)"
-        if [[ -n "$ahead_behind" ]]; then
-            local behind="${ahead_behind%	*}"
-            local ahead="${ahead_behind#*	}"
-            [[ $ahead -gt 0 ]] && status="${status}%F{green}↑%f"
-            [[ $behind -gt 0 ]] && status="${status}%F{red}↓%f"
-        fi
-
-        echo "%F{magenta}($branch)%f$status "
-    }
-
-        exit_status() {
-        [[ $? -eq 0 ]] || echo "%F{red}[$?]%f "
-    }
-
-    PS1='%F{blue}%n@%m%f %F{cyan}%~%f $(git_prompt_info)%(?.%F{green}.%F{red})%#%f '
-    PS2='%F{yellow}...%f '
 fi
 
 
