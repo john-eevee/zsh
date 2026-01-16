@@ -91,9 +91,16 @@ setopt GLOB_COMPLETE
 setopt INTERACTIVE_COMMENTS
 setopt TRANSIENT_RPROMPT
 
+
+# Load plugins
+for file in "$XDG_CONFIG_HOME/zsh/plugins"/*.zsh(N); do
+	source "$file"
+done
+
 # Other PATHs
 append-path "$HOME/.pub-cache/bin"
 append-path "$HOME/.local/share/mise/shims"
+. "$HOME/.local/share/../bin/env"
 
 # Calculate and display shell startup time
 local endtime=$(date +%s.%N)
