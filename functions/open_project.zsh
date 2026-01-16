@@ -78,7 +78,7 @@ function open_project() {
     _post_project_cd
 
     # Open in editor
-    local editor="${EDITOR:-code}"
+    local editor="${EDITOR:-zed}"
     "$editor" .
     log_info "Opened project at $result in $editor"
 }
