@@ -22,8 +22,9 @@
 #   glog    : pretty log (git log --oneline --graph --decorate)
 #   gbd     : delete local branch(es) (git branch -D ...)
 #   gsync   : push then pull current branch (gpo + glom)
-#   gdone   : finish current branch and delete it, based on main
+#   gdone   : finish current branch, push it, and checks main
 #   gnew    : create a new branch from main (must be on main and clean)
+#   gwt     : create a new working tree (for concurrent work)
 #
 # Completions:
 #   This file installs lightweight zsh completion wrappers so the short aliases
@@ -49,6 +50,10 @@ git_is_dirty() {
 
 gc() {
     git commit "$@"
+}
+
+gac() {
+  git commit -a "$@"
 }
 
 gco() {
@@ -104,14 +109,20 @@ gbd() {
 
 gsync() {
   local  branch="$(git_current_branch)" || return 1
-  gpo "$branch" && glom "$branch"
+  if [[git_is_dirty()]]; then
+    echo "You have changes to commit, before syncing"
+    return 1
+  fi
+  glomr
+  gpom
+
+
 }
 
 gdone() {
-  local branch="$(git_current_branch)" || return 1
+  gpom
   git checkout main
   git pull origin main --rebase || return 1
-  git branch -D "$branch"
 }
 
 gnew() {
@@ -128,6 +139,30 @@ gnew() {
   git pull origin main --rebase || return 1
   git checkout -b "$1"
 
+}
+
+gwt() {
+  local branch="$1"
+  local worktree_name="$2"
+  
+  if [[ -z "$branch" ]]; then
+    echo "Usage: gwt <branch> [worktree-name]"
+    echo "Creates a new working tree for the given branch."
+    echo ""
+    echo "Examples:"
+    echo "  gwt feature-x                 # Creates worktree in ./feature-x"
+    echo "  gwt feature-x ../concurrent   # Creates worktree in ../concurrent"
+    return 1
+  fi
+  
+  # Use branch name as worktree name if not provided
+  if [[ -z "$worktree_name" ]]; then
+    worktree_name="./${branch}"
+  fi
+  
+  # Create the working tree
+  git worktree add "$worktree_name" "$branch" || return 1
+  echo "✓ Created working tree at: $worktree_name"
 }
 
 # zsh completion wrappers for the git aliases defined in this file.
@@ -205,7 +240,7 @@ __git_alias_complete() {
 # Install completion wrappers for each alias if `compdef` is available.
 # We check both commands and functions because compdef may be an autoload.
 if (( $+commands[compdef] )) || (( $+functions[compdef] )); then
-  for _alias in gc gco gcb gp gpo gpom gl glom glomr gst gs glog gbd gnew; do
+  for _alias in gc gco gcb gp gpo gpom gl glom glomr gst gs glog gbd gnew gwt; do
     eval "_git_alias_${_alias}() { __git_alias_complete ${_alias} }"
     compdef "_git_alias_${_alias}" ${_alias}
   done
