@@ -4,7 +4,7 @@
 
 # Gradle wrapper
 alias gw='./gradlew'
-alias mv='./mvnw'
+alias mn='./mvnw'
 
 # Elixir/Phoenix/Mix
 alias phx='mix phx.server'
