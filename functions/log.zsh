@@ -3,7 +3,7 @@ function log() {
     local message
 
     # Define log level hierarchy
-    local -A levels=(debug=0 info=1 warn=2 error=3 fatal=4)
+    typeset -A levels=( debug 0 info 1 warn 2 error 3 fatal 4 )
 
     # Parse options
     while [[ $# -gt 0 ]]; do
@@ -67,14 +67,18 @@ EOF
 
     local timestamp
     timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
-
+    red=$(tput setaf 1)
+    green=$(tput setaf 2)
+    yellow=$(tput setaf 3)
+    blue=$(tput setaf 4)
+    normal=$(tput sgr0)
     # Log with colors
     case "$level" in
-        debug)  print "[${timestamp}] %B%F{blue}DEBUG%f%b: $*" ;;
-        info)   print "[${timestamp}] %B%F{green}INFO%f%b: $*" ;;
-        warn)   print "[${timestamp}] %B%F{yellow}WARN%f%b: $*" ;;
-        error)  print "[${timestamp}] %B%F{red}ERROR%f%b: $*" >&2 ;;
-        fatal)  print "[${timestamp}] %B%F{red}FATAL%f%b: $*" >&2; return 1 ;;
+        debug)  printf "[${timestamp}] ${blue}DEBUG${normal}: $*" ;;
+        info)   printf "[${timestamp}] ${green}INFO${normal}: $*" ;;
+        warn)   printf "[${timestamp}] ${yellow}WARN${normal}: $*" ;;
+        error)  printf "[${timestamp}] ${red}ERROR${normal}: $*" >&2 ;;
+        fatal)  printf "[${timestamp}] ${red}FATAL${normal}: $*" >&2; return 1 ;;
     esac
 }
 
