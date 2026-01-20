@@ -105,4 +105,5 @@ append-path "$HOME/.local/share/mise/shims"
 # Calculate and display shell startup time
 local endtime=$(date +%s.%N)
 local elapsed=$(echo "a=($endtime - $starttime) * 1000; scale=3; a/1" | bc)
+print "$(day_of_season --south)"
 print "initialized in ${elapsed}ms"
